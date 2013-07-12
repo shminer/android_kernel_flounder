@@ -407,6 +407,8 @@ void tegra_dc_call_flip_callback(void);
 unsigned long tegra_dc_poll_register(struct tegra_dc *dc,
 u32 reg, u32 mask, u32 exp_val, u32 poll_interval_us,
 u32 timeout_ms);
+/* defined in dc.c, used by ext/dev.c */
+extern int no_vsync;
 
 /* defined in dc.c, used in ext/dev.c */
 int tegra_dc_config_frame_end_intr(struct tegra_dc *dc, bool enable);
@@ -465,4 +467,8 @@ int tegra_dc_cursor_set(struct tegra_dc *dc, bool enable, int x, int y);
 int tegra_dc_cursor_clip(struct tegra_dc *dc, unsigned clip);
 int tegra_dc_cursor_suspend(struct tegra_dc *dc);
 int tegra_dc_cursor_resume(struct tegra_dc *dc);
+
+/* defined in dc.c, used in dc.c and window.c */
+bool tegra_dc_windows_are_dirty(struct tegra_dc *dc, u32 win_act_req_mask);
+
 #endif

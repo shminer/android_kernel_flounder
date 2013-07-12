@@ -2028,7 +2028,7 @@ crc_error:
 }
 EXPORT_SYMBOL(tegra_dc_read_checksum_latched);
 
-static bool tegra_dc_windows_are_dirty(struct tegra_dc *dc)
+bool tegra_dc_windows_are_dirty(struct tegra_dc *dc, u32 win_act_req_mask)
 {
 	u32 val;
 
@@ -2036,7 +2036,7 @@ static bool tegra_dc_windows_are_dirty(struct tegra_dc *dc)
 		return false;
 
 	val = tegra_dc_readl(dc, DC_CMD_STATE_CONTROL);
-	if (val & WIN_ALL_ACT_REQ)
+	if (val & (win_act_req_mask))
 		return true;
 
 	return false;
@@ -2201,7 +2201,7 @@ static void tegra_dc_vblank(struct work_struct *work)
 	tegra_dc_get(dc);
 
 	/* Clear the V_BLANK_FLIP bit of vblank ref-count if update is clean. */
-	if (!tegra_dc_windows_are_dirty(dc))
+	if (!tegra_dc_windows_are_dirty(dc, WIN_ALL_ACT_REQ))
 		clear_bit(V_BLANK_FLIP, &dc->vblank_ref_count);
 
 	/* Update the SD brightness */
@@ -2424,7 +2424,7 @@ static void tegra_dc_vpulse2(struct work_struct *work)
 	tegra_dc_get(dc);
 
 	/* Clear the V_PULSE2_FLIP if no update */
-	if (!tegra_dc_windows_are_dirty(dc))
+	if (!tegra_dc_windows_are_dirty(dc, WIN_ALL_ACT_REQ))
 		clear_bit(V_PULSE2_FLIP, &dc->vpulse2_ref_count);
 
 	/* Update the SD brightness */
@@ -2822,6 +2822,9 @@ static int tegra_dc_init(struct tegra_dc *dc)
 	tegra_dc_writel(dc, int_enable, DC_CMD_INT_ENABLE);
 	tegra_dc_writel(dc, ALL_UF_INT(), DC_CMD_INT_MASK);
 	tegra_dc_init_vpulse2_int(dc);
+
+	tegra_dc_writel(dc, WRITE_MUX_ASSEMBLY | READ_MUX_ASSEMBLY,
+		DC_CMD_STATE_ACCESS);
 
 #if !defined(CONFIG_TEGRA_DC_BLENDER_GEN2)
 	tegra_dc_writel(dc, 0x00000000, DC_DISP_BORDER_COLOR);
@@ -3260,7 +3263,7 @@ void tegra_dc_blank(struct tegra_dc *dc, unsigned windows)
 		dcwins[nr_win++]->flags &= ~TEGRA_WIN_FLAG_ENABLED;
 	}
 
-	tegra_dc_update_windows(dcwins, nr_win, NULL);
+	tegra_dc_update_windows(dcwins, nr_win, NULL, true);
 	tegra_dc_sync_windows(dcwins, nr_win);
 	tegra_dc_program_bandwidth(dc, true);
 }

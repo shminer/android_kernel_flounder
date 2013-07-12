@@ -728,7 +728,7 @@ static void tegra_adf_dev_post(struct adf_device *dev, struct adf_post *cfg,
 
 	if (!skip_flip) {
 		tegra_dc_update_windows(wins, nr_win,
-			data->dirty_rect_valid ? data->dirty_rect : NULL);
+			data->dirty_rect_valid ? data->dirty_rect : NULL, true);
 		/* TODO: implement swapinterval here */
 		tegra_dc_sync_windows(wins, nr_win);
 		tegra_dc_program_bandwidth(adf_info->dc, true);
