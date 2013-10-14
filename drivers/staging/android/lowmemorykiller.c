@@ -46,6 +46,9 @@
 #include <linux/cpuset.h>
 #include <linux/show_mem_notifier.h>
 #include <linux/vmpressure.h>
+#ifdef CONFIG_TEGRA_NVMAP
+#include <linux/nvmap.h>
+#endif
 
 #include <trace/events/memkill.h>
 #define CREATE_TRACE_POINTS
@@ -461,6 +464,10 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 						total_swapcache_pages();
 	else
 		other_file = 0;
+
+#ifdef CONFIG_TEGRA_NVMAP
+			 other_free += nvmap_page_pool_get_unused_pages();
+#endif
 
 	si_swapinfo(&swap_info);
 	other_free += swap_info.freeswap;
