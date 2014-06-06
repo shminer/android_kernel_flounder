@@ -1001,6 +1001,7 @@ int tegra_dc_bandwidth_negotiate_bw(struct tegra_dc *dc,
 
 	return 0;
 }
+EXPORT_SYMBOL(tegra_dc_bandwidth_negotiate_bw);
 
 void tegra_dc_bandwidth_renegotiate(void *p, u32 avail_bw)
 {
