@@ -288,7 +288,9 @@ struct tegra_dc {
 	} cursor;
 
 	int	ctrl_num;
+	bool	switchdev_registered;
 
 	struct sysedp_consumer *sysedpc;
+
 };
 #endif
