@@ -37,6 +37,7 @@
 #include <mach/tegra_dc_ext.h>
 #endif
 #include <mach/isomgr.h>
+#include <linux/sysedp.h>
 
 #include "dc_reg.h"
 
@@ -287,5 +288,7 @@ struct tegra_dc {
 	} cursor;
 
 	int	ctrl_num;
+
+	struct sysedp_consumer *sysedpc;
 };
 #endif
