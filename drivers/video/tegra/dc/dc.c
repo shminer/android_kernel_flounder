@@ -484,7 +484,8 @@ void tegra_dc_get(struct tegra_dc *dc)
 void tegra_dc_put(struct tegra_dc *dc)
 {
 	/* balance extra dc clk reference */
-	clk_disable_unprepare(dc->clk);
+	if (!tegra_platform_is_linsim())
+		clk_disable_unprepare(dc->clk);
 
 	tegra_dc_io_end(dc);
 }
@@ -2799,7 +2800,7 @@ void tegra_dc_disable(struct tegra_dc *dc)
 	trace_display_mode(dc, &dc->mode);
 
 	/* disable pending clks due to uncompleted frames */
-	while (tegra_is_clk_enabled(dc->clk))
+	while (!tegra_platform_is_linsim() && tegra_is_clk_enabled(dc->clk))
 		tegra_dc_put(dc);
 }
 
