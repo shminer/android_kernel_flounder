@@ -1114,6 +1114,19 @@ static void tegra_dc_set_scaling_filter(struct tegra_dc *dc)
 	}
 }
 
+static int _tegra_dc_config_frame_end_intr(struct tegra_dc *dc, bool enable)
+{
+	tegra_dc_io_start(dc);
+	if (enable) {
+		atomic_inc(&dc->frame_end_ref);
+		tegra_dc_unmask_interrupt(dc, FRAME_END_INT);
+	} else if (!atomic_dec_return(&dc->frame_end_ref))
+		tegra_dc_mask_interrupt(dc, FRAME_END_INT);
+	tegra_dc_io_end(dc);
+
+	return 0;
+}
+
 #ifdef CONFIG_TEGRA_DC_CMU
 static void tegra_dc_cache_cmu(struct tegra_dc *dc,
 					struct tegra_dc_cmu *src_cmu)
@@ -1198,19 +1211,6 @@ int tegra_dc_update_cmu(struct tegra_dc *dc, struct tegra_dc_cmu *cmu)
 	return 0;
 }
 EXPORT_SYMBOL(tegra_dc_update_cmu);
-
-static int _tegra_dc_config_frame_end_intr(struct tegra_dc *dc, bool enable)
-{
-	tegra_dc_io_start(dc);
-	if (enable) {
-		atomic_inc(&dc->frame_end_ref);
-		tegra_dc_unmask_interrupt(dc, FRAME_END_INT);
-	} else if (!atomic_dec_return(&dc->frame_end_ref))
-		tegra_dc_mask_interrupt(dc, FRAME_END_INT);
-	tegra_dc_io_end(dc);
-
-	return 0;
-}
 
 int tegra_dc_update_cmu_aligned(struct tegra_dc *dc, struct tegra_dc_cmu *cmu)
 {
@@ -1809,6 +1809,7 @@ static void tegra_dc_vblank(struct work_struct *work)
 
 static void tegra_dc_frame_end(struct work_struct *work)
 {
+#ifdef CONFIG_TEGRA_DC_CMU
 	struct tegra_dc *dc = container_of(work,
 		struct tegra_dc, frame_end_work);
 	u32 val;
@@ -1851,6 +1852,7 @@ static void tegra_dc_frame_end(struct work_struct *work)
 
 	tegra_dc_put(dc);
 	mutex_unlock(&dc->lock);
+#endif
 }
 
 static void tegra_dc_one_shot_worker(struct work_struct *work)
