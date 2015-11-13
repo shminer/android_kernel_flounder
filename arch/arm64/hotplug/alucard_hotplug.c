@@ -164,7 +164,7 @@ static void __ref hotplug_work_fn(struct work_struct *work)
 					 || rq_avg_calc == false)) {
 					if (pcpu_info->cur_up_rate %
 							pcpu_info->up_rate == 0) {
-	#if 1
+	#if 0
 						pr_info("CPU[%u], UPCPU[%u], \
 							cur_freq[%u], cur_load[%u], \
 							rq_avg[%u], up_rate[%u]\n",
@@ -191,7 +191,7 @@ static void __ref hotplug_work_fn(struct work_struct *work)
 						 || rq_avg_calc == false)))) {
 						if (pcpu_info->cur_down_rate %
 								pcpu_info->down_rate == 0) {
-	#if 1
+	#if 0
 							pr_info("CPU[%u], \
 								cur_freq[%u], \
 								cur_load[%u], \
