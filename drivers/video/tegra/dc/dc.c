@@ -117,11 +117,6 @@ static int tegra_dc_resume(struct platform_device *ndev);
 
 struct tegra_dc *tegra_dcs[TEGRA_MAX_DC];
 
-#ifdef CONFIG_TEGRA_NVDISPLAY
-static struct tegra_dc_win	tegra_dc_windows[DC_N_WINDOWS];
-#endif
-
-
 DEFINE_MUTEX(tegra_dc_lock);
 DEFINE_MUTEX(shared_lock);
 
@@ -1427,11 +1422,7 @@ struct tegra_dc_win *tegra_dc_get_window(struct tegra_dc *dc, unsigned win)
 	if (win >= DC_N_WINDOWS || !test_bit(win, &dc->valid_windows))
 		return NULL;
 
-#ifdef CONFIG_TEGRA_NVDISPLAY
-	return &tegra_dc_windows[win];
-#else
 	return &dc->windows[win];
-#endif
 }
 EXPORT_SYMBOL(tegra_dc_get_window);
 
@@ -3714,11 +3705,7 @@ static int tegra_dc_probe(struct platform_device *ndev)
 
 	dc->n_windows = DC_N_WINDOWS;
 	for (i = 0; i < DC_N_WINDOWS; i++) {
-#ifdef CONFIG_TEGRA_NVDISPLAY
-		struct tegra_dc_win *win = &tegra_dc_windows[i];
-#else
 		struct tegra_dc_win *win = &dc->windows[i];
-#endif
 		struct tegra_dc_win *tmp_win = &dc->tmp_wins[i];
 		if (!test_bit(i, &dc->valid_windows))
 			win->flags |= TEGRA_WIN_FLAG_INVALID;
